@@ -1,0 +1,117 @@
+starting
+pinwheel_idvae
+
+optimizerNamespace(betavae=0.2, contiz_dim=64, data='pinwheel', discretez_dim=5, fb=0, gen_model_hidden_layers=2, grad_clip=5.0, h_dim=512, l2reg=1e-05, lr=1e-05, model='idvae', momentum=0.5, nf_dim=128, num_bijectors=2, num_epochs=20000, optimizer='rmsprop', out_dim=784, subsample=20000, target_kl=7.0)
+l2reg1e-05
+kl_weight1.0
+nf_dim128
+nf_modelRealNVP
+num_bijectors2
+batch_normFalse
+grad_clip5.0
+rand_seed5207
+gen_model_hidden_layers2
+
+
+hi i'm startingidgmmvae_model
+optimizerdiscretez_dim5h_dim512contiz_dim64
+
+Itr[0]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6087523, 5.550006, 0.423, 0.000685647, 3.874661, -7.1187067]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.608773, 5.5143557, 0.425, 0.0006649436, 3.8624039, -7.123686]
+
+Itr[200]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.606719, 3.5287852, 0.404, 0.0027187373, 2.475808, -5.1630735]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6067584, 3.607391, 0.407, 0.0026795596, 2.4857485, -5.1607733]
+
+Itr[400]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6017414, 2.3145306, 0.43, 0.007696433, 1.7374394, -3.940012]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6017344, 2.319395, 0.411, 0.0077036764, 1.7246859, -3.9460275]
+
+Itr[600]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6064831, 1.74223, 0.588, 0.0029548088, 0.96807873, -3.3396513]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6066581, 1.7448069, 0.595, 0.002779761, 0.98125, -3.3537116]
+
+Itr[800]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6089365, 1.50892, 0.409, 0.0005013683, 0.40130246, -3.1310668]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6089396, 1.5264211, 0.42, 0.00049825193, 0.41748506, -3.1345048]
+
+Itr[1000]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.609258, 1.4405541, 0.77, 0.00017973912, 0.18122388, -3.057776]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6092592, 1.446742, 0.787, 0.0001785735, 0.18302509, -3.0512671]
+
+Itr[1200]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6092932, 1.4197661, 0.564, 0.00014484978, 0.07884417, -3.032189]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6092939, 1.4178267, 0.577, 0.0001440171, 0.07993466, -3.0239716]
+
+Itr[1400]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093162, 1.4162868, 0.784, 0.00012171185, 0.046005826, -3.016519]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.609311, 1.4058347, 0.792, 0.00012684656, 0.04485408, -3.0198512]
+
+Itr[1600]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093559, 1.3952054, 0.597, 8.196223e-05, 0.016620545, -3.0035615]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093539, 1.3987993, 0.584, 8.399081e-05, 0.018794684, -3.0052638]
+
+Itr[1800]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093382, 1.3991677, 0.777, 9.969461e-05, 0.012402406, -3.010814]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093423, 1.4024509, 0.759, 9.562337e-05, 0.01650641, -3.009372]
+
+Itr[2000]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093802, 1.3885889, 0.769, 5.7679415e-05, 0.020932978, -2.9961743]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093804, 1.381429, 0.754, 5.7617424e-05, 0.015667526, -2.9913864]
+
+Itr[2200]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093652, 1.4039056, 0.766, 7.257807e-05, 0.014462883, -3.0102139]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093667, 1.3874382, 0.788, 7.1091294e-05, 0.014386509, -2.998108]
+
+Itr[2400]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.609363, 1.3808999, 0.584, 7.4858544e-05, 0.032384202, -2.9890327]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093599, 1.3949245, 0.583, 7.7997924e-05, 0.027084986, -3.0060453]
+
+Itr[2600]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093591, 1.3964131, 0.794, 7.859909e-05, -0.0024013452, -3.0013392]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093643, 1.392887, 0.764, 7.3444724e-05, -0.006117655, -3.001319]
+
+Itr[2800]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093633, 1.3833394, 0.773, 7.4622156e-05, 0.0143159535, -2.9939022]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093642, 1.3816385, 0.744, 7.3753115e-05, 0.013575467, -2.9918258]
+
+Itr[3000]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093756, 1.3858743, 0.755, 6.2420484e-05, 0.009433708, -2.9938245]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093764, 1.3796834, 0.779, 6.157446e-05, 0.006326267, -2.9887326]
+
+Itr[3200]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093838, 1.3916717, 0.563, 5.404544e-05, -0.00457534, -2.9979308]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093881, 1.386731, 0.585, 4.9901842e-05, -0.0024865423, -2.9930024]
+
+Itr[3400]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093882, 1.3878267, 0.77, 4.9837352e-05, 0.0005542856, -2.9963179]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093887, 1.3844595, 0.756, 4.9270868e-05, 0.004386921, -2.9932425]
+
+Itr[3600]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093806, 1.3802311, 0.749, 5.7515623e-05, 0.005646247, -2.9898121]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093814, 1.3831482, 0.75, 5.6611538e-05, 0.00019571424, -2.9928493]
+
+Itr[3800]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093844, 1.3844786, 0.792, 5.3518175e-05, 0.00022017727, -2.9930098]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093833, 1.3900179, 0.775, 5.4726243e-05, 0.0005586793, -2.9992836]
+
+Itr[4000]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093816, 1.385331, 0.758, 5.6361794e-05, -0.000725132, -2.9923084]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093825, 1.3832763, 0.758, 5.5330038e-05, -0.0004637375, -2.9904692]
+
+Itr[4200]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093528, 1.3790095, 0.767, 8.506513e-05, -0.007684662, -2.991741]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093532, 1.393116, 0.774, 8.479571e-05, -0.007609248, -3.0043945]
+
+Itr[4400]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093724, 1.3842062, 0.784, 6.569946e-05, 0.013741343, -2.9915113]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.609371, 1.3861609, 0.764, 6.717217e-05, 0.009630771, -2.9954994]
+
+Itr[4600]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093711, 1.386959, 0.775, 6.685197e-05, 0.0025028924, -2.9974566]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093718, 1.3822641, 0.774, 6.624698e-05, 0.0028494813, -2.991498]
+
+Itr[4800]
+train ent loss zacc kl_discrete kl_conti iw_nll[1.6093944, 1.3902383, 0.78, 4.3567656e-05, 0.023163926, -2.998772]
+test ent loss zacc kl_discrete kl_conti iw_nll[1.6093926, 1.3851682, 0.755, 4.5304656e-05, 0.025785718, -2.9927132]
