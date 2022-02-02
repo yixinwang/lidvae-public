@@ -11,7 +11,7 @@ This repository contains the code for
 
 #### Environment
 
-The code is tested in Python 3.8.6, Pytorch 1.4.0, and Tensorflow 1.14.0.
+The code is tested in Python 3.7.3, Pytorch 1.4.0, and Tensorflow 1.14.0.
 
 #### References
 
