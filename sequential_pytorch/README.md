@@ -13,5 +13,5 @@ This implementation extends
 https://github.com/jxhe/vae-lagging-encoder. The implementation of
 LIDVAE lives in `src/modules/decoders/dec_lstm.py`.
 
-_Note: LIDVAE tends to work well with large learning rate (e.g.
+_Note: LIDVAE tends to work better with large learning rate (e.g.
 lr=0.1) and small weight decay (e.g. l2_reg=1e-6, 5e-6, 1e-5)._
