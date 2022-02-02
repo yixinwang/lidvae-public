@@ -1,0 +1,369 @@
+
+R version 3.5.3 (2019-03-11) -- "Great Truth"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> # install.packages("rstan", lib="/rigel/stats/users/yw2539/rpackages/")
+> # install.packages("ramify", lib="/rigel/stats/users/yw2539/rpackages/")
+> # install.packages("Rcpp", lib="/rigel/stats/users/yw2539/rpackages/")
+> 
+> .libPaths("/rigel/stats/users/yw2539/rpackages/")
+> 
+> options(bitmapType='cairo')
+> 
+> library(rstan)
+Loading required package: StanHeaders
+Loading required package: ggplot2
+rstan (Version 2.19.3, GitRev: 2e1f913d3ca3)
+For execution on a local, multicore CPU with excess RAM we recommend calling
+options(mc.cores = parallel::detectCores()).
+To avoid recompilation of unchanged Stan programs, we recommend calling
+rstan_options(auto_write = TRUE)
+> library(matrixStats)
+> library(ramify)
+
+Attaching package: ‘ramify’
+
+The following object is masked from ‘package:graphics’:
+
+    clip
+
+> 
+> rstan_options(auto_write = TRUE)
+> 
+> dir.create(file.path('/rigel/stats/users/yw2539/dgm_yw2539/src/neurips2020/gmm_collapse', 'out'))
+Warning message:
+In dir.create(file.path("/rigel/stats/users/yw2539/dgm_yw2539/src/neurips2020/gmm_collapse",  :
+  '/rigel/stats/users/yw2539/dgm_yw2539/src/neurips2020/gmm_collapse/out' already exists
+> 
+> set.seed(689934)
+> 
+> source("utils.R")
+> 
+> 
+> # one gaussian clusters
+> 
+> N <- 10000
+> mu <- c(-1);
+> sigma <- c(1);
+> y <- rnorm(N, mu, sigma);
+> 
+> theta_prior <- 5
+> 
+> stan_rdump(c("N", "y","mu", "sigma", "theta_prior"), file="out/single_gaussian.data.R")
+> 
+> # plot likelihood
+> single_gaussian <- read_rdump("out/single_gaussian.data.R")
+> 
+> single_gaussian_max_marginal_ll = optim(rnorm(4), 
++         fn = gmm_marginal_ll, 
++         method = "BFGS", 
++         control = list(fnscale = -1),
++         input_data = single_gaussian,
++         beta_a=0.5, beta_b=0.5)
+> 
+> alphas = linspace(0, 1, n = 1000)
+> single_gaussian_ll_alphas_est = sapply(alphas, gmm_ll, params=single_gaussian_max_marginal_ll$par, input_data=single_gaussian)
+> 
+> single_gaussian_ll_alphas_true = sapply(alphas, gmm_ll, params=c(-0.5,0,-0.5,0), input_data=single_gaussian)
+> 
+> write.csv(single_gaussian_ll_alphas_est, "out/single_gaussian_ll_alphas_est.csv")
+> write.csv(single_gaussian_ll_alphas_true, "out/single_gaussian_ll_alphas_true.csv")
+> write.csv(single_gaussian_max_marginal_ll$par, "out/single_gaussian_optim_params.csv")
+> 
+> 
+> 
+> 
+> 
+> stan_file = 'gauss_mix.stan'
+> # fit by hmc
+> degenerate_fit_hmc <- stan(file=stan_file, data=single_gaussian,
++                        chains=4, seed=483892929, refresh=2000)
+
+SAMPLING FOR MODEL 'gauss_mix' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 0 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 130.68 seconds (Warm-up)
+Chain 1:                148.92 seconds (Sampling)
+Chain 1:                279.6 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'gauss_mix' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 0 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 146.5 seconds (Warm-up)
+Chain 2:                151.52 seconds (Sampling)
+Chain 2:                298.02 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'gauss_mix' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 0.01 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 100 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 147.92 seconds (Warm-up)
+Chain 3:                145.91 seconds (Sampling)
+Chain 3:                293.83 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL 'gauss_mix' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 0 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 151.03 seconds (Warm-up)
+Chain 4:                141.91 seconds (Sampling)
+Chain 4:                292.94 seconds (Total)
+Chain 4: 
+> 
+> # fit by vb
+> gauss_mix_stan = stan_model(file=stan_file, verbose=TRUE)
+
+TRANSLATING MODEL 'gauss_mix' FROM Stan CODE TO C++ CODE NOW.
+successful in parsing the Stan model 'gauss_mix'.
+> degenerate_fit_vbmf <- vb(gauss_mix_stan, data=single_gaussian, 
++ 	tol_rel_obj = 1e-3, algorithm ="meanfield")
+Chain 1: ------------------------------------------------------------
+Chain 1: EXPERIMENTAL ALGORITHM:
+Chain 1:   This procedure has not been thoroughly tested and may be unstable
+Chain 1:   or buggy. The interface is subject to change.
+Chain 1: ------------------------------------------------------------
+Chain 1: 
+Chain 1: 
+Chain 1: 
+Chain 1: Gradient evaluation took 0 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Begin eta adaptation.
+Chain 1: Iteration:   1 / 250 [  0%]  (Adaptation)
+Chain 1: Iteration:  50 / 250 [ 20%]  (Adaptation)
+Chain 1: Iteration: 100 / 250 [ 40%]  (Adaptation)
+Chain 1: Iteration: 150 / 250 [ 60%]  (Adaptation)
+Chain 1: Iteration: 200 / 250 [ 80%]  (Adaptation)
+Chain 1: Success! Found best value [eta = 1] earlier than expected.
+Chain 1: 
+Chain 1: Begin stochastic gradient ascent.
+Chain 1:   iter             ELBO   delta_ELBO_mean   delta_ELBO_med   notes 
+Chain 1:    100       -14268.370             1.000            1.000
+Chain 1:    200       -14236.086             0.501            1.000
+Chain 1:    300       -14230.111             0.334            0.002
+Chain 1:    400       -14233.307             0.251            0.002
+Chain 1:    500       -14229.125             0.201            0.000   MEDIAN ELBO CONVERGED
+Chain 1: 
+Chain 1: Drawing a sample of size 1000 from the approximate posterior... 
+Chain 1: COMPLETED.
+Warning: Pareto k diagnostic value is 1. Resampling is disabled. Decreasing tol_rel_obj may help if variational algorithm has terminated prematurely. Otherwise consider using sampling instead.
+> 
+> degenerate_fit_vbfr <- vb(gauss_mix_stan, data=single_gaussian, 
++ 	tol_rel_obj = 1e-3, algorithm ="fullrank")
+Chain 1: ------------------------------------------------------------
+Chain 1: EXPERIMENTAL ALGORITHM:
+Chain 1:   This procedure has not been thoroughly tested and may be unstable
+Chain 1:   or buggy. The interface is subject to change.
+Chain 1: ------------------------------------------------------------
+Chain 1: 
+Chain 1: 
+Chain 1: 
+Chain 1: Gradient evaluation took 0 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Begin eta adaptation.
+Chain 1: Iteration:   1 / 250 [  0%]  (Adaptation)
+Chain 1: Iteration:  50 / 250 [ 20%]  (Adaptation)
+Chain 1: Iteration: 100 / 250 [ 40%]  (Adaptation)
+Chain 1: Iteration: 150 / 250 [ 60%]  (Adaptation)
+Chain 1: Iteration: 200 / 250 [ 80%]  (Adaptation)
+Chain 1: Iteration: 250 / 250 [100%]  (Adaptation)
+Chain 1: Success! Found best value [eta = 0.1].
+Chain 1: 
+Chain 1: Begin stochastic gradient ascent.
+Chain 1:   iter             ELBO   delta_ELBO_mean   delta_ELBO_med   notes 
+Chain 1:    100       -17794.584             1.000            1.000
+Chain 1:    200       -14967.158             0.594            1.000
+Chain 1:    300       -14449.610             0.408            0.189
+Chain 1:    400       -14444.735             0.306            0.189
+Chain 1:    500       -14302.302             0.247            0.036
+Chain 1:    600       -14253.821             0.206            0.036
+Chain 1:    700       -14243.601             0.177            0.010
+Chain 1:    800       -14239.898             0.155            0.010
+Chain 1:    900       -14237.994             0.138            0.003
+Chain 1:   1000       -14243.656             0.124            0.003
+Chain 1:   1100       -14237.812             0.024            0.001   MEDIAN ELBO CONVERGED
+Chain 1: 
+Chain 1: Drawing a sample of size 1000 from the approximate posterior... 
+Chain 1: COMPLETED.
+Warning: Pareto k diagnostic value is 1.01. Resampling is disabled. Decreasing tol_rel_obj may help if variational algorithm has terminated prematurely. Otherwise consider using sampling instead.
+> 
+> # curate all fits
+> methods = c("hmc", "vbmf", "vbfr")
+> fits = c(degenerate_fit_hmc, degenerate_fit_vbmf, degenerate_fit_vbfr)
+> 
+> 
+> 
+> 
+> # plot the fits
+> c_light_trans <- c("#DCBCBCBF")
+> c_light_highlight_trans <- c("#C79999BF")
+> c_mid_trans <- c("#B97C7CBF")
+> c_mid_highlight_trans <- c("#A25050BF")
+> c_dark_trans <- c("#8F2727BF")
+> c_dark_highlight_trans <- c("#7C0000BF")
+> 
+> 
+> for (i in 1:length(fits)){
++ 	method = methods[i]
++ 	degenerate_fit = fits[i][[1]]
++ 
++ 	print(method)
++ 	print(degenerate_fit)
++ 
++ 	if (method=="hmc"){
++ 		params <- as.data.frame(extract(degenerate_fit, permuted=FALSE)[,1,])
++ 		theta_sample = params$theta
++ 	}
++ 	else {
++ 		theta_sample = extract(degenerate_fit)$theta
++ 	}
++ 
++ 	write.csv(theta_sample, paste(c("out/single_gaussian_theta_sample_", method, ".csv"), collapse = ''))
++ }
+[1] "hmc"
+Inference for Stan model: gauss_mix.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+              mean se_mean   sd      2.5%       25%       50%       75%
+mu[1]        -0.99    0.01 0.21     -1.41     -1.12     -1.00     -0.88
+mu[2]        -0.99    0.01 0.22     -1.39     -1.12     -0.99     -0.87
+sigma[1]      0.98    0.00 0.05      0.88      0.95      0.98      1.01
+sigma[2]      0.98    0.00 0.05      0.87      0.95      0.98      1.01
+theta         0.50    0.00 0.17      0.18      0.38      0.50      0.62
+lp__     -14215.12    0.05 1.61 -14219.30 -14215.82 -14214.74 -14213.96
+             97.5% n_eff Rhat
+mu[1]        -0.54   578 1.01
+mu[2]        -0.50   603 1.00
+sigma[1]      1.07   736 1.00
+sigma[2]      1.07   661 1.00
+theta         0.83  1467 1.00
+lp__     -14213.22   941 1.00
+
+Samples were drawn using NUTS(diag_e) at Thu Jun  4 09:45:44 2020.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+[1] "vbmf"
+Inference for Stan model: gauss_mix.
+1 chains, each with iter=1000; warmup=0; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=1000.
+
+          mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff khat
+mu[1]    -1.02     NaN 0.01 -1.05 -1.03 -1.02 -1.01 -0.99   NaN 1.00
+mu[2]    -1.01     NaN 0.05 -1.09 -1.04 -1.01 -0.97 -0.92   NaN 0.99
+sigma[1]  1.00     NaN 0.01  0.99  1.00  1.00  1.01  1.02   NaN 1.00
+sigma[2]  0.97     NaN 0.03  0.91  0.95  0.97  0.99  1.02   NaN 1.01
+theta     0.71     NaN 0.08  0.53  0.66  0.72  0.76  0.85   NaN 0.96
+lp__      0.00     NaN 0.00  0.00  0.00  0.00  0.00  0.00   NaN 1.00
+
+Approximate samples were drawn using VB(meanfield) at Thu Jun  4 09:45:51 2020.
+We recommend genuine 'sampling' from the posterior distribution for final inferences!
+[1] "vbfr"
+Inference for Stan model: gauss_mix.
+1 chains, each with iter=1000; warmup=0; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=1000.
+
+          mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff khat
+mu[1]    -0.99     NaN 0.01 -1.01 -0.99 -0.99 -0.98 -0.97   NaN 1.01
+mu[2]    -1.00     NaN 0.21 -1.43 -1.15 -1.00 -0.87 -0.60   NaN 1.04
+sigma[1]  1.01     NaN 0.02  0.98  1.00  1.01  1.02  1.05   NaN 1.01
+sigma[2]  0.57     NaN 0.27  0.21  0.39  0.51  0.70  1.24   NaN 1.04
+theta     0.94     NaN 0.04  0.84  0.93  0.95  0.97  0.99   NaN 1.01
+lp__      0.00     NaN 0.00  0.00  0.00  0.00  0.00  0.00   NaN 1.01
+
+Approximate samples were drawn using VB(fullrank) at Thu Jun  4 09:45:59 2020.
+We recommend genuine 'sampling' from the posterior distribution for final inferences!
+> 
+> 
+> 
+> 
+> 	# pdf(paste(c("out/gmm_sym_prior_", method, ".pdf"), collapse = ''))
+> 
+> # 	if (method=="hmc"){
+> # 		params1 <- as.data.frame(extract(degenerate_fit, permuted=FALSE)[,1,])
+> # 		params2 <- as.data.frame(extract(degenerate_fit, permuted=FALSE)[,2,])
+> # 		params3 <- as.data.frame(extract(degenerate_fit, permuted=FALSE)[,3,])
+> # 		params4 <- as.data.frame(extract(degenerate_fit, permuted=FALSE)[,4,])
+> 
+> # 		par(mar = c(4, 4, 0.5, 0.5))
+> # 		plot(params1$"mu[1]", params1$"mu[2]", col=c_dark_highlight_trans, pch=16, cex=0.8,
+> # 		     xlab="mu1", xlim=c(-3, 3), ylab="mu2", ylim=c(-3, 3))
+> # 		points(params2$"mu[1]", params2$"mu[2]", col=c_dark_trans, pch=16, cex=0.8)
+> # 		points(params3$"mu[1]", params3$"mu[2]", col=c_mid_highlight_trans, pch=16, cex=0.8)
+> # 		points(params4$"mu[1]", params4$"mu[2]", col=c_mid_trans, pch=16, cex=0.8)
+> # 		lines(0.08*(1:100) - 4, 0.08*(1:100) - 4, col="grey", lw=2)
+> # 		legend("topright", c("Chain 1", "Chain 2", "Chain 3", "Chain 4"),
+> # 		       fill=c(c_dark_highlight_trans, c_dark_trans,
+> # 		              c_mid_highlight_trans, c_mid_trans), box.lty=0, inset=0.0005)
+> # 	}
+> # 	else {
+> # 		params1 <- as.data.frame(extract(degenerate_fit, permuted=FALSE)[,1,])
+> # 		par(mar = c(4, 4, 0.5, 0.5))
+> # 		plot(params1$"mu[1]", params1$"mu[2]", col=c_dark_highlight_trans, pch=16, cex=0.8,
+> # 		     xlab="mu1", xlim=c(-3, 3), ylab="mu2", ylim=c(-3, 3))
+> # 		legend("topright", c("vb"),
+> # 		       fill=c(c_dark_highlight_trans), box.lty=0, inset=0.0005)
+> # 	}
+> # 	dev.off()
+> # }
+> 
+> 
+> 
+> proc.time()
+    user   system  elapsed 
+1207.726    0.606 1211.029 

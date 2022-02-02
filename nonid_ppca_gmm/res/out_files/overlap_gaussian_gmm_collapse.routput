@@ -1,0 +1,339 @@
+
+R version 3.5.3 (2019-03-11) -- "Great Truth"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> # install.packages("rstan", lib="/rigel/stats/users/yw2539/rpackages/")
+> # install.packages("ramify", lib="/rigel/stats/users/yw2539/rpackages/")
+> # install.packages("Rcpp", lib="/rigel/stats/users/yw2539/rpackages/")
+> 
+> .libPaths("/rigel/stats/users/yw2539/rpackages/")
+> 
+> options(bitmapType='cairo')
+> 
+> library(rstan)
+Loading required package: StanHeaders
+Loading required package: ggplot2
+rstan (Version 2.19.3, GitRev: 2e1f913d3ca3)
+For execution on a local, multicore CPU with excess RAM we recommend calling
+options(mc.cores = parallel::detectCores()).
+To avoid recompilation of unchanged Stan programs, we recommend calling
+rstan_options(auto_write = TRUE)
+> library(matrixStats)
+> library(ramify)
+
+Attaching package: ‘ramify’
+
+The following object is masked from ‘package:graphics’:
+
+    clip
+
+> 
+> rstan_options(auto_write = TRUE)
+> 
+> dir.create(file.path('/rigel/stats/users/yw2539/dgm_yw2539/src/neurips2020/gmm_collapse', 'out'))
+Warning message:
+In dir.create(file.path("/rigel/stats/users/yw2539/dgm_yw2539/src/neurips2020/gmm_collapse",  :
+  '/rigel/stats/users/yw2539/dgm_yw2539/src/neurips2020/gmm_collapse/out' already exists
+> 
+> set.seed(689934)
+> 
+> source("utils.R")
+> 
+> # two overlapping gaussian clusters
+> 
+> N <- 10000
+> mu <- c(-0.5, 0.5);
+> sigma <- c(1, 1);
+> lambda <- 0.15
+> z <- rbinom(N, 1, lambda) + 1;
+> y <- rnorm(N, mu[z], sigma[z]);
+> 
+> theta <- 0.25
+> 
+> theta_prior <- 5
+> 
+> stan_rdump(c("N", "y", "theta", "theta_prior"), file="out/overlap_gaussian.data.R")
+> 
+> overlap_gaussian <- read_rdump("out/overlap_gaussian.data.R")
+> 
+> overlap_gaussian_max_marginal_ll = optim(rnorm(4), 
++         fn = gmm_marginal_ll, 
++         method = "BFGS", 
++         control = list(fnscale = -1),
++         input_data = overlap_gaussian,
++         beta_a=0.5, beta_b=0.5)
+> 
+> alphas = linspace(0, 1, n = 1000)
+> overlap_gaussian_ll_alphas_est = sapply(alphas, gmm_ll, params=overlap_gaussian_max_marginal_ll$par, input_data=overlap_gaussian)
+> 
+> overlap_gaussian_ll_alphas_true = sapply(alphas, gmm_ll, params=c(-0.75,0,0.75,0), input_data=overlap_gaussian)
+> 
+> write.csv(overlap_gaussian_ll_alphas_est, "out/overlap_gaussian_ll_alphas_est.csv")
+> write.csv(overlap_gaussian_ll_alphas_true, "out/overlap_gaussian_ll_alphas_true.csv")
+> write.csv(overlap_gaussian_max_marginal_ll$par, "out/overlap_gaussian_optim_params.csv")
+> 
+> 
+> 
+> stan_file = 'gauss_mix.stan'
+> # fit by hmc
+> degenerate_fit_hmc <- stan(file=stan_file, data=overlap_gaussian,
++                        chains=4, seed=483892929, refresh=2000)
+
+SAMPLING FOR MODEL 'gauss_mix' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 0 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 110.68 seconds (Warm-up)
+Chain 1:                111.58 seconds (Sampling)
+Chain 1:                222.26 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'gauss_mix' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 0.01 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 100 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 119.93 seconds (Warm-up)
+Chain 2:                97.91 seconds (Sampling)
+Chain 2:                217.84 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'gauss_mix' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 0 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 118.84 seconds (Warm-up)
+Chain 3:                129.28 seconds (Sampling)
+Chain 3:                248.12 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL 'gauss_mix' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 0 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 115 seconds (Warm-up)
+Chain 4:                126.46 seconds (Sampling)
+Chain 4:                241.46 seconds (Total)
+Chain 4: 
+Warning messages:
+1: The largest R-hat is 1.31, indicating chains have not mixed.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#r-hat 
+2: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#bulk-ess 
+3: Tail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#tail-ess 
+> 
+> # fit by vb
+> gauss_mix_stan = stan_model(file=stan_file, verbose=TRUE)
+
+TRANSLATING MODEL 'gauss_mix' FROM Stan CODE TO C++ CODE NOW.
+successful in parsing the Stan model 'gauss_mix'.
+> degenerate_fit_vbmf <- vb(gauss_mix_stan, data=overlap_gaussian, 
++ 	tol_rel_obj = 1e-3, algorithm ="meanfield")
+Chain 1: ------------------------------------------------------------
+Chain 1: EXPERIMENTAL ALGORITHM:
+Chain 1:   This procedure has not been thoroughly tested and may be unstable
+Chain 1:   or buggy. The interface is subject to change.
+Chain 1: ------------------------------------------------------------
+Chain 1: 
+Chain 1: 
+Chain 1: 
+Chain 1: Gradient evaluation took 0 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Begin eta adaptation.
+Chain 1: Iteration:   1 / 250 [  0%]  (Adaptation)
+Chain 1: Iteration:  50 / 250 [ 20%]  (Adaptation)
+Chain 1: Iteration: 100 / 250 [ 40%]  (Adaptation)
+Chain 1: Iteration: 150 / 250 [ 60%]  (Adaptation)
+Chain 1: Iteration: 200 / 250 [ 80%]  (Adaptation)
+Chain 1: Success! Found best value [eta = 1] earlier than expected.
+Chain 1: 
+Chain 1: Begin stochastic gradient ascent.
+Chain 1:   iter             ELBO   delta_ELBO_mean   delta_ELBO_med   notes 
+Chain 1:    100       -14880.976             1.000            1.000
+Chain 1:    200       -14877.351             0.500            1.000
+Chain 1:    300       -14870.840             0.334            0.000   MEDIAN ELBO CONVERGED
+Chain 1: 
+Chain 1: Drawing a sample of size 1000 from the approximate posterior... 
+Chain 1: COMPLETED.
+Warning: Pareto k diagnostic value is 1.05. Resampling is disabled. Decreasing tol_rel_obj may help if variational algorithm has terminated prematurely. Otherwise consider using sampling instead.
+> 
+> degenerate_fit_vbfr <- vb(gauss_mix_stan, data=overlap_gaussian, 
++ 	tol_rel_obj = 1e-3, algorithm ="fullrank")
+Chain 1: ------------------------------------------------------------
+Chain 1: EXPERIMENTAL ALGORITHM:
+Chain 1:   This procedure has not been thoroughly tested and may be unstable
+Chain 1:   or buggy. The interface is subject to change.
+Chain 1: ------------------------------------------------------------
+Chain 1: 
+Chain 1: 
+Chain 1: 
+Chain 1: Gradient evaluation took 0 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Begin eta adaptation.
+Chain 1: Iteration:   1 / 250 [  0%]  (Adaptation)
+Chain 1: Iteration:  50 / 250 [ 20%]  (Adaptation)
+Chain 1: Iteration: 100 / 250 [ 40%]  (Adaptation)
+Chain 1: Iteration: 150 / 250 [ 60%]  (Adaptation)
+Chain 1: Iteration: 200 / 250 [ 80%]  (Adaptation)
+Chain 1: Iteration: 250 / 250 [100%]  (Adaptation)
+Chain 1: Success! Found best value [eta = 0.1].
+Chain 1: 
+Chain 1: Begin stochastic gradient ascent.
+Chain 1:   iter             ELBO   delta_ELBO_mean   delta_ELBO_med   notes 
+Chain 1:    100       -15055.348             1.000            1.000
+Chain 1:    200       -14894.721             0.505            1.000
+Chain 1:    300       -14881.619             0.337            0.011
+Chain 1:    400       -14872.125             0.253            0.011
+Chain 1:    500       -14871.050             0.202            0.001   MEDIAN ELBO CONVERGED
+Chain 1: 
+Chain 1: Drawing a sample of size 1000 from the approximate posterior... 
+Chain 1: COMPLETED.
+Warning: Pareto k diagnostic value is 0.91. Resampling is unreliable. Increasing the number of draws or decreasing tol_rel_obj may help.
+> 
+> # curate all fits
+> methods = c("hmc", "vbmf", "vbfr")
+> fits = c(degenerate_fit_hmc, degenerate_fit_vbmf, degenerate_fit_vbfr)
+> 
+> 
+> 
+> 
+> # plot the fits
+> c_light_trans <- c("#DCBCBCBF")
+> c_light_highlight_trans <- c("#C79999BF")
+> c_mid_trans <- c("#B97C7CBF")
+> c_mid_highlight_trans <- c("#A25050BF")
+> c_dark_trans <- c("#8F2727BF")
+> c_dark_highlight_trans <- c("#7C0000BF")
+> 
+> 
+> for (i in 1:length(fits)){
++ 	method = methods[i]
++ 	degenerate_fit = fits[i][[1]]
++ 
++ 	print(method)
++ 	print(degenerate_fit)
++ 
++ 	if (method=="hmc"){
++ 		params <- as.data.frame(extract(degenerate_fit, permuted=FALSE)[,1,])
++ 		theta_sample = params$theta
++ 	}
++ 	else {
++ 		theta_sample = extract(degenerate_fit)$theta
++ 	}
++ 
++ 	write.csv(theta_sample, paste(c("out/overlap_gaussian_theta_sample_", method, ".csv"), collapse = ''))
++ }
+[1] "hmc"
+Inference for Stan model: gauss_mix.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+              mean se_mean   sd      2.5%       25%       50%       75%
+mu[1]        -0.40    0.08 0.22     -0.76     -0.56     -0.46     -0.24
+mu[2]        -0.28    0.09 0.24     -0.72     -0.49     -0.25     -0.14
+sigma[1]      1.02    0.03 0.09      0.87      0.96      1.00      1.10
+sigma[2]      1.06    0.03 0.09      0.87      0.99      1.08      1.13
+theta         0.51    0.01 0.16      0.19      0.40      0.50      0.63
+lp__     -14857.19    0.06 1.75 -14861.50 -14858.03 -14856.82 -14855.92
+             97.5% n_eff Rhat
+mu[1]         0.07     7 1.38
+mu[2]         0.24     8 1.37
+sigma[1]      1.18     8 1.36
+sigma[2]      1.19     9 1.33
+theta         0.81   925 1.00
+lp__     -14854.95   833 1.00
+
+Samples were drawn using NUTS(diag_e) at Thu Jun  4 09:42:45 2020.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+[1] "vbmf"
+Inference for Stan model: gauss_mix.
+1 chains, each with iter=1000; warmup=0; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=1000.
+
+          mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff khat
+mu[1]    -0.27     NaN 0.02 -0.31 -0.29 -0.27 -0.26 -0.24   NaN 1.04
+mu[2]    -0.66     NaN 0.05 -0.77 -0.70 -0.66 -0.63 -0.56   NaN 1.08
+sigma[1]  1.09     NaN 0.01  1.06  1.08  1.09  1.09  1.11   NaN 1.05
+sigma[2]  0.86     NaN 0.09  0.71  0.80  0.86  0.91  1.03   NaN 1.04
+theta     0.84     NaN 0.02  0.79  0.83  0.84  0.86  0.89   NaN 1.05
+lp__      0.00     NaN 0.00  0.00  0.00  0.00  0.00  0.00   NaN 1.05
+
+Approximate samples were drawn using VB(meanfield) at Thu Jun  4 09:42:50 2020.
+We recommend genuine 'sampling' from the posterior distribution for final inferences!
+[1] "vbfr"
+Inference for Stan model: gauss_mix.
+1 chains, each with iter=1000; warmup=0; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=1000.
+
+          mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff khat
+mu[1]    -0.63     NaN 0.13 -0.88 -0.71 -0.63 -0.55 -0.36   NaN 0.93
+mu[2]    -0.31     NaN 0.02 -0.36 -0.32 -0.31 -0.29 -0.26   NaN 0.92
+sigma[1]  0.74     NaN 0.09  0.58  0.68  0.74  0.80  0.92   NaN 0.92
+sigma[2]  1.10     NaN 0.02  1.07  1.09  1.10  1.11  1.13   NaN 0.92
+theta     0.12     NaN 0.05  0.05  0.09  0.11  0.15  0.24   NaN 0.93
+lp__      0.00     NaN 0.00  0.00  0.00  0.00  0.00  0.00   NaN 0.91
+
+Approximate samples were drawn using VB(fullrank) at Thu Jun  4 09:42:58 2020.
+We recommend genuine 'sampling' from the posterior distribution for final inferences!
+> 
+> 
+> 
+> 
+> proc.time()
+    user   system  elapsed 
+1021.840    0.551 1029.460 
