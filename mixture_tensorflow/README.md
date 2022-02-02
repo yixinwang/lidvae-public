@@ -7,5 +7,5 @@ To run this study, run `src/run_fit_idgmm_sweep.sh` which fit LIDGMVAE
 to different datasets.
 
 The `res/` folder contains some sample output files from fitting
-LIDGMVAE.
+LIDGMVAE (after only a few epochs).
 
